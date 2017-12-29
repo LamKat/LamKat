@@ -36,10 +36,10 @@ function setupMap() {
 
 
 	function drawApplications(objJSON) {
+		console.log(objJSON);
 		objJSON.foreach(function(objApp) {
 			var p = L.polygon(objApp.Geometry).addTo(map);
 		});
-		alert(objJSON[0].Geometry);
 	}
 }
 
@@ -52,6 +52,7 @@ function getApplications(callback) {
     xJSON.open('GET', 'test.json', true);
     xJSON.onreadystatechange = function() {
         if (xJSON.readyState == 4 && xJSON.status == "200") {
+	    console.log(xJSON.responseText);
             var objJSON = JSON.parse(xJSON.responseText);
             callback(objJSON);
         }
