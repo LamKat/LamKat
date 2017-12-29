@@ -39,6 +39,7 @@ function setupMap() {
 		objJSON.foreach(function(objApp) {
 			var p = L.polygon(objApp.Geometry).addTo(map);
 		});
+		alert(objJSON[0].Geometry);
 	}
 }
 
