@@ -1,6 +1,6 @@
 [
 	{
-		"Address":"8 Glenside\rWoodthorpe\rNottinghamshire\rNG5 4NT\r",
+		"Address":"8 Glenside<br>Woodthorpe<br>Nottinghamshire<br>NG5 4NT",
 		"Description":"NMA for application 2016/0970.",
 		"URL":"https://pawam.gedling.gov.uk/online-applications/caseDetails.do?caseType=Application&keyVal=OUOLO3HL0CA00",
 		"Date":"1502236800000",
@@ -13,7 +13,7 @@
 		]
 	},
 	{
-		"Address":"49 Willerby Road\rWoodthorpe\rNG5 4NZ",
+		"Address":"49 Willerby Road<br>Woodthorpe<br>NG5 4NZ",
 		"Description":"Garage conversion and front porch.",
 		"URL":"https://pawam.gedling.gov.uk/online-applications/caseDetails.do?caseType=Application&keyVal=OSOBZJHLFVY00",
 		"Date":"1499644800000",
@@ -31,7 +31,7 @@
 		]
 	},
 	{
-		"Address":"9 Somersby Road\rWoodthorpe\rNG3 5QY",
+		"Address":"9 Somersby Road<br>Woodthorpe<br>NG3 5QY",
 		"Description":"Erection of two storey side to form dinning room, sunroom and hobby room with bedroom and en-suite facilities above, juliet balcony, front porch  and single storey side extension",
 		"URL":"https://pawam.gedling.gov.uk/online-applications/caseDetails.do?caseType=Application&keyVal=OV14Q2HLGEC00",
 		"Date":"1504137600000",
@@ -49,7 +49,7 @@
 		]
 	},
 	{
-		"Address":"59 Walsingham Road\rWoodthorpe\rNottinghamshire\rNG5 4NQ\r",
+		"Address":"59 Walsingham Road<br>Woodthorpe<br>Nottinghamshire<br>NG5 4NQ",
 		"Description":"Proposed decking to rear",
 		"URL":"https://pawam.gedling.gov.uk/online-applications/caseDetails.do?caseType=Application&keyVal=KZ496OHL06R00",
 		"Date":"1267660800000",
