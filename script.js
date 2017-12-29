@@ -15,10 +15,10 @@ function setupMap() {
 	function onLocationFound(e) {
 		var radius = e.accuracy / 2;
 
-		L.marker(e.latlng).addTo(map)
-			.bindPopup("You are within " + radius + " meters from this point");
+		L.marker(e.latlng).addTo(map).bindPopup("You are here");
+			//.bindPopup("You are within " + radius + " meters from this point");
 
-		L.circle(e.latlng, radius).addTo(map);
+		//L.circle(e.latlng, radius).addTo(map);
 
 	}
 
@@ -38,7 +38,9 @@ function setupMap() {
 	function drawApplications(objJSON) {
 		console.log(objJSON);
 		for (i = 0; i < objJSON.length; i++) { 
-			L.polygon(objJSON[i].Geometry).addTo(map);
+			L.polygon(objJSON[i].Geometry)
+				.addTo(map)
+				.bindPopup(objJSON[i].Description + '<br><a href="' + objJSON[i].URL + '">More info</a>');
 		}
 	}
 }
