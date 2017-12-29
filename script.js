@@ -20,7 +20,6 @@ function setupMap() {
 
 		L.circle(e.latlng, radius).addTo(map);
 
-		getApplications(drawApplications)
 	}
 
 	function onLocationError(e) {
@@ -32,16 +31,18 @@ function setupMap() {
 
 	map.locate({setView: true, maxZoom: 16});
 
+	
+	getApplications(drawApplications)
 
+
+	function drawApplications(objJSON) {
+		objJSON.foreach(function(objApp) {
+			var p = L.polygon(objApp.Geometry).addTo(map);
+		});
+	}
 }
 
-function drawApplications(objJSON) {
-	var map = L.map('map').fitWorld();
 
-	objJSON.foreach(function(objApp) {
-		var p = L.polygon(objApp.Geometry).addTo(map);
-	});
-}
 
 function getApplications(callback) {
 
