@@ -16,9 +16,11 @@ function setupMap() {
 		var radius = e.accuracy / 2;
 
 		L.marker(e.latlng).addTo(map)
-			.bindPopup("You are within " + radius + " meters from this point").openPopup();
+			.bindPopup("You are within " + radius + " meters from this point");
 
 		L.circle(e.latlng, radius).addTo(map);
+
+		getApplications(drawApplications)
 	}
 
 	function onLocationError(e) {
@@ -30,10 +32,15 @@ function setupMap() {
 
 	map.locate({setView: true, maxZoom: 16});
 
-	getApplications(function (objJSON) {
-		alert(objJSON[0].Description);
-	})
 
+}
+
+function drawApplications(objJSON) {
+	var map = L.map('map').fitWorld();
+
+	objJSON.foreach(function(objApp) {
+		var p = L.polygon(objApp.Geometry).addTo(map);
+	});
 }
 
 function getApplications(callback) {
