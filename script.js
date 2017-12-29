@@ -37,9 +37,9 @@ function setupMap() {
 
 	function drawApplications(objJSON) {
 		console.log(objJSON);
-		objJSON.foreach(function(objApp) {
-			var p = L.polygon(objApp.Geometry).addTo(map);
-		});
+		for (i = 0; i < objJSON.length; i++) { 
+			L.polygon(objJSON[i].Geometry).addTo(map);
+		}
 	}
 }
 
