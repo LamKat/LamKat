@@ -2,6 +2,8 @@
 
 
 function setupMap() {
+	var mapOverlays;
+
 	var map = L.map('map').fitWorld();
 
 	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
@@ -12,16 +14,7 @@ function setupMap() {
 		id: 'mapbox.streets'
 	}).addTo(map);
 
-	function onLocationFound(e) {
-		var radius = e.accuracy / 2;
-
-		L.marker(e.latlng).addTo(map).bindPopup("You are here");
-			//.bindPopup("You are within " + radius + " meters from this point");
-
-		//L.circle(e.latlng, radius).addTo(map);
-
-	}
-
+	
 	function onLocationError(e) {
 		alert(e.message);
 	}
@@ -31,21 +24,44 @@ function setupMap() {
 
 	map.locate({setView: true, maxZoom: 16});
 
-	
-	getApplications(drawApplications)
+	function onLocationFound(e) {
+		var radius = e.accuracy / 2;
+		L.marker(e.latlng).addTo(map).bindPopup("You are here");
 
+		getApplications(drawApplications);
+		function drawApplications(objJSON) {
+			var polygonLayer = L.layerGroup();
+			var pinLayer = L.layerGroup();
+			for (i = 0; i < objJSON.length; i++) { 
+				var popup = objJSON[i].Description + '<br><a href="' + objJSON[i].URL + '">More info</a>';
+				polygonLayer.addLayer(L.polygon(objJSON[i].Geometry).bindPopup(popup));
+				pinLayer.addLayer(L.marker(coordinateCentre(objJSON[i].Geometry)).bindPopup(popup));
 
-	function drawApplications(objJSON) {
-		console.log(objJSON);
-		for (i = 0; i < objJSON.length; i++) { 
-			L.polygon(objJSON[i].Geometry)
-				.addTo(map)
-				.bindPopup(objJSON[i].Description + '<br><a href="' + objJSON[i].URL + '">More info</a>');
+			}
+			polygonLayer.addTo(map);
+			var viewLayers = {
+				"Polygons":polygonLayer,
+				"Pins":pinLayer
+			}
+			L.control.layers(viewLayers).addTo(map);
 		}
 	}
+
+
+	
+	
 }
 
-
+function coordinateCentre(coords) {
+	//If coords is empty then dont hide div 0 error
+	var x = 0, y = 0;
+	for (j = 0; j < coords.length; j++) { 
+		x += coords[j][0];
+		y += coords[j][1];
+	}
+	var centre = [x / coords.length, y / coords.length];
+	return centre;
+}
 
 function getApplications(callback) {
 
