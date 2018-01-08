@@ -67,7 +67,7 @@ function getApplications(callback) {
 
     var xJSON = new XMLHttpRequest();
     xJSON.overrideMimeType("application/json");
-    xJSON.open('GET', 'https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-get-app', true);//'test.json', true);
+    xJSON.open('GET', 'test.json', true);
     xJSON.onreadystatechange = function() {
         if (xJSON.readyState == 4 && xJSON.status == "200") {
 	    console.log(xJSON.responseText);
