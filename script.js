@@ -28,20 +28,32 @@ function setupMap() {
 		var radius = e.accuracy / 2;
 		L.marker(e.latlng).addTo(map).bindPopup("You are here");
 
-		getApplications(drawApplications);
+		getApplications(e.latitude, e.longitude, drawApplications);
 		function drawApplications(objJSON) {
 			var polygonLayer = L.layerGroup();
-			var pinLayer = L.layerGroup();
-			for (i = 0; i < objJSON.length; i++) { 
+			//var pinLayer = L.layerGroup();
+			
+			polygonLayer.addLayer(L.geoJSON(objJSON, {
+				onEachFeature: onEachFeature
+			}));
+			
+			function onEachFeature(feature, layer) {
+				if (feature.properties) {
+					layer.bindPopup(feature.properties.description + '<br><a href="' + feature.properties.url + '">More info</a>');
+				}
+			}
+			
+			
+			/*for (i = 0; i < objJSON.length; i++) { 
 				var popup = objJSON[i].Description + '<br><a href="' + objJSON[i].URL + '">More info</a>';
 				polygonLayer.addLayer(L.polygon(objJSON[i].Geometry).bindPopup(popup));
 				pinLayer.addLayer(L.marker(coordinateCentre(objJSON[i].Geometry)).bindPopup(popup));
 
-			}
+			}*/
 			polygonLayer.addTo(map);
 			var viewLayers = {
 				"Polygons":polygonLayer,
-				"Pins":pinLayer
+				//"Pins":pinLayer
 			}
 			L.control.layers(viewLayers).addTo(map);
 		}
@@ -63,11 +75,14 @@ function coordinateCentre(coords) {
 	return centre;
 }
 
-function getApplications(callback) {
+function getApplications(latitude, longitude, callback) {
 
     var xJSON = new XMLHttpRequest();
     xJSON.overrideMimeType("application/json");
-    xJSON.open('GET', 'https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-get-app' /*'test.json'*/, true);
+    xJSON.open('GET', 'https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-get-app?' + 
+								'radius=0.5&' + 
+								'latitude=' + latitude + 
+								'&longitude=' + longitude, true);
     xJSON.onreadystatechange = function() {
         if (xJSON.readyState == 4 && xJSON.status == "200") {
 	    console.log(xJSON.responseText);
