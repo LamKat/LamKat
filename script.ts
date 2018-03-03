@@ -42,56 +42,51 @@ function drawApplications(geojson :  GeoJsonObject) : void {
 	}));
 }
 
-function createApplicationPopup(prop: GeoJsonProperties) : L.Popup {
-	if(prop === null) {
-		return L.popup().setContent('<p>This application doesn\' have any valid properties</p>');
-	} else {
-		var popup: HTMLElement = document.createElement('div');
-		var props : any[] = prop.applications;
-		switch (props.length) {
-			case 0:
-				//TODO handle
-				break;
-			case 1:
-				popup = $($.parseHTML(f(new ApplicationProperty(prop[0])))).get(0);
-				break;
-			default:
-				var s: string = '<div id="myCarousel" class="carousel slide" data-wrap="false" data-interval="false">' +
-				'  <ul class="pager">' +
-				'	<li class="previous"><a href="#myCarousel" data-slide="prev">&larr; Newer</a></li>' +
-				'	<li class="next"><a href="#myCarousel" data-slide="next">Older &rarr;</a></li>' +
-				'  </ul>' +
-				'  <div class="carousel-inner">' +
-				'  </div>' +
-				'</div>';
-				console.log(s);
-		
-				var elm = $($.parseHTML(s));
-				var inner = elm.find('.carousel-inner');
-				for(var i = 0; i < props.length; i++) {
-					inner.append(f(new ApplicationProperty(prop[0])));
-				}
-				inner.find('.item:first').addClass('active');
-				elm.find('.previous').hide();
-				elm.on('slid.bs.carousel', "", ()  => {
-					elm.find('li').show();
-					if(elm.find('.carousel-inner .item:last').hasClass('active')) {
-						elm.find('.next').hide();
-					} else if(elm.find('.carousel-inner .item:first').hasClass('active')) {
-						elm.find('.previous').hide();
-					} 
-				});
-				popup = elm.get(0);
-		}
-		return L.popup().setContent(popup);
-
+function createApplicationPopup(a: any) : L.Popup {
+	var prop: Application[] = a.applications;
+	var popup: HTMLElement = document.createElement('div');
+	switch (prop.length) {
+		case 0:
+			//TODO handle
+			break;
+		case 1:
+			popup = $($.parseHTML(f(prop[0]))).get(0);
+			break;
+		default:
+			var s: string = '<div id="myCarousel" class="carousel slide" data-wrap="false" data-interval="false">' +
+			'  <ul class="pager">' +
+			'	<li class="previous"><a href="#myCarousel" data-slide="prev">&larr; Newer</a></li>' +
+			'	<li class="next"><a href="#myCarousel" data-slide="next">Older &rarr;</a></li>' +
+			'  </ul>' +
+			'  <div class="carousel-inner">' +
+			'  </div>' +
+			'</div>';
+	
+			var elm = $($.parseHTML(s));
+			var inner = elm.find('.carousel-inner');
+			for(var i = 0; i < prop.length; i++) {
+				inner.append(f(prop[i]));
+			}
+			inner.find('.item:first').addClass('active');
+			elm.find('.previous').hide();
+			elm.on('slid.bs.carousel', "", ()  => {
+				elm.find('li').show();
+				if(elm.find('.carousel-inner .item:last').hasClass('active')) {
+					elm.find('.next').hide();
+				} else if(elm.find('.carousel-inner .item:first').hasClass('active')) {
+					elm.find('.previous').hide();
+				} 
+			});
+			popup = elm.get(0);
 	}
+	return L.popup().setContent(popup);
+
 }
 
-function f(prop: ApplicationProperty) : string {
+function f(prop: Application) : string {
 	return '<div class="item">' +
-	'		<p>Certificate of lawfulness (proposed) for single storey rear extension and rear dormer.</p>' +
-	'		<a href="">More info</a>' +
+	'		<p>' + prop.Description +'</p>' +
+	'		<a href="' + prop.URL + '">More info</a>' +
 	'	</div>' ;
 }
 
@@ -112,8 +107,9 @@ class ServerDAO {
 
 }
 
-class ApplicationProperty  {
-	constructor(prop: GeoJsonProperties) {
-	}
-
+interface Application {
+	Reference: string;
+	Description: string;
+	URL: string;
+	Comments?: any;
 }
