@@ -40,13 +40,21 @@
 		</div>
 
 		<template id='popupTemplate'>
-			<div >
-				<ul class="pager">
-					<li class="previous disabled"><a href="#">&larr; Newer</a></li>
-					<li class="next"><a href="#">Older &rarr;</a></li>
-				</ul>
-				<p>Certificate of lawfulness (proposed) for single storey rear extension and rear dormer.</p>
-				<a href="http://publicaccess.nottinghamcity.gov.uk/online-applications/applicationDetails.do?activeTab=summary&keyVal=OJAPT7LYINR00">More info</a>
+				<h2>Carousel Example</h2>  
+				<div id="myCarousel" class="carousel slide" data-wrap="false">			  
+				  <ul class="pager">
+					<li class="previous disabled"><a href="#myCarousel" data-slide="prev">&larr; Newer</a></li>
+					<li class="next"><a href="#myCarousel" data-slide="next">Older &rarr;</a></li>
+				  </ul>
+				  <div class="carousel-inner"></div>
+				</div>
+		</template>
+
+
+		<template id="popupContentTemplate">
+			<div class="item">
+				<p id='popupText'></p>
+				<a id='popupLink' href="">More info</a>
 			</div>
 		</template>
 	</body>

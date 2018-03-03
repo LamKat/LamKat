@@ -37,27 +37,55 @@ function drawApplications(geojson) {
     }));
 }
 function createApplicationPopup(prop) {
-    var popup = new L.Popup();
     if (prop === null) {
         return L.popup().setContent('<p>This application doesn\' have any valid properties</p>');
     }
     else {
-        var tmp = $('#popupTemplate').get(0);
-        var maybePopupRoot = tmp.content.querySelector("div");
-        if (maybePopupRoot === null) {
-            console.log("No template found");
-            return L.popup().setContent('<p>This application doesn\' have any valid properties</p>');
+        var popup = document.createElement('div');
+        var props = prop.applications;
+        switch (props.length) {
+            case 0:
+                //TODO handle
+                break;
+            case 1:
+                popup = $($.parseHTML(f(new ApplicationProperty(prop[0])))).get(0);
+                break;
+            default:
+                var s = '<div id="myCarousel" class="carousel slide" data-wrap="false" data-interval="false">' +
+                    '  <ul class="pager">' +
+                    '	<li class="previous"><a href="#myCarousel" data-slide="prev">&larr; Newer</a></li>' +
+                    '	<li class="next"><a href="#myCarousel" data-slide="next">Older &rarr;</a></li>' +
+                    '  </ul>' +
+                    '  <div class="carousel-inner">' +
+                    '  </div>' +
+                    '</div>';
+                console.log(s);
+                var elm = $($.parseHTML(s));
+                var inner = elm.find('.carousel-inner');
+                for (var i = 0; i < props.length; i++) {
+                    inner.append(f(new ApplicationProperty(prop[0])));
+                }
+                inner.find('.item:first').addClass('active');
+                elm.find('.previous').hide();
+                elm.on('slid.bs.carousel', "", function () {
+                    elm.find('li').show();
+                    if (elm.find('.carousel-inner .item:last').hasClass('active')) {
+                        elm.find('.next').hide();
+                    }
+                    else if (elm.find('.carousel-inner .item:first').hasClass('active')) {
+                        elm.find('.previous').hide();
+                    }
+                });
+                popup = elm.get(0);
         }
-        var x = maybePopupRoot;
-        console.log(tmp);
-        // var rl: HTMLElement = tmp.content.cloneNode().textContent;
-        return L.popup().setContent(x);
-        // console.log(prop.applications);
+        return L.popup().setContent(popup);
     }
-    // console.log(prop);
-    // prop.applications;
-    //feature.properties.description + '<br><a href="' + feature.properties.url + '">More info</a>'
-    // return new L.Popup();
+}
+function f(prop) {
+    return '<div class="item">' +
+        '		<p>Certificate of lawfulness (proposed) for single storey rear extension and rear dormer.</p>' +
+        '		<a href="">More info</a>' +
+        '	</div>';
 }
 var ServerDAO = /** @class */ (function () {
     function ServerDAO() {
@@ -77,8 +105,6 @@ var ServerDAO = /** @class */ (function () {
 }());
 var ApplicationProperty = /** @class */ (function () {
     function ApplicationProperty(prop) {
-        if (prop !== null) {
-        }
     }
     return ApplicationProperty;
 }());

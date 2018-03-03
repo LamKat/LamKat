@@ -43,32 +43,56 @@ function drawApplications(geojson :  GeoJsonObject) : void {
 }
 
 function createApplicationPopup(prop: GeoJsonProperties) : L.Popup {
-	var popup = new L.Popup();
 	if(prop === null) {
 		return L.popup().setContent('<p>This application doesn\' have any valid properties</p>');
 	} else {
-		var tmp: HTMLTemplateElement = $('#popupTemplate').get(0) as HTMLTemplateElement;
-		var maybePopupRoot = tmp.content.querySelector("div");
-		if(maybePopupRoot === null) {
-			console.log("No template found");
-			return L.popup().setContent('<p>This application doesn\' have any valid properties</p>');
-		} 
-
-		var x: HTMLElement = maybePopupRoot;
+		var popup: HTMLElement = document.createElement('div');
+		var props : any[] = prop.applications;
+		switch (props.length) {
+			case 0:
+				//TODO handle
+				break;
+			case 1:
+				popup = $($.parseHTML(f(new ApplicationProperty(prop[0])))).get(0);
+				break;
+			default:
+				var s: string = '<div id="myCarousel" class="carousel slide" data-wrap="false" data-interval="false">' +
+				'  <ul class="pager">' +
+				'	<li class="previous"><a href="#myCarousel" data-slide="prev">&larr; Newer</a></li>' +
+				'	<li class="next"><a href="#myCarousel" data-slide="next">Older &rarr;</a></li>' +
+				'  </ul>' +
+				'  <div class="carousel-inner">' +
+				'  </div>' +
+				'</div>';
+				console.log(s);
 		
+				var elm = $($.parseHTML(s));
+				var inner = elm.find('.carousel-inner');
+				for(var i = 0; i < props.length; i++) {
+					inner.append(f(new ApplicationProperty(prop[0])));
+				}
+				inner.find('.item:first').addClass('active');
+				elm.find('.previous').hide();
+				elm.on('slid.bs.carousel', "", ()  => {
+					elm.find('li').show();
+					if(elm.find('.carousel-inner .item:last').hasClass('active')) {
+						elm.find('.next').hide();
+					} else if(elm.find('.carousel-inner .item:first').hasClass('active')) {
+						elm.find('.previous').hide();
+					} 
+				});
+				popup = elm.get(0);
+		}
+		return L.popup().setContent(popup);
 
-		console.log(tmp);
-		// var rl: HTMLElement = tmp.content.cloneNode().textContent;
-
-		return L.popup().setContent(x);
-		// console.log(prop.applications);
 	}
+}
 
-	// console.log(prop);
-	// prop.applications;
-//feature.properties.description + '<br><a href="' + feature.properties.url + '">More info</a>'
-
-	// return new L.Popup();
+function f(prop: ApplicationProperty) : string {
+	return '<div class="item">' +
+	'		<p>Certificate of lawfulness (proposed) for single storey rear extension and rear dormer.</p>' +
+	'		<a href="">More info</a>' +
+	'	</div>' ;
 }
 
 class ServerDAO {
@@ -90,9 +114,6 @@ class ServerDAO {
 
 class ApplicationProperty  {
 	constructor(prop: GeoJsonProperties) {
-		if(prop !== null) {
-
-		}
 	}
 
 }
