@@ -6,7 +6,11 @@ import {
     LatLng as _LatLng, 
     geoJSON as _geoJSON
 } from "leaflet";
-import  { GeoJsonObject as _GeoJsonObject } from "geojson"
+
+import  {
+    GeoJsonObject as _GeoJsonObject,
+    GeoJsonProperties as _GeoJsonProperties 
+} from "geojson";
 
 declare global {
     const leaflet: typeof Leafletjs;
@@ -15,7 +19,7 @@ declare global {
     type Map = _Map;
     type LatLng = _LatLng;
     type GeoJsonObject = _GeoJsonObject;
-    // type geoJSON = _geoJSON;
+    type GeoJsonProperties = _GeoJsonProperties;
 }
 
 export {};

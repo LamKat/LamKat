@@ -1,6 +1,5 @@
 /// <reference path="script.d.ts" />
 
-
 var map : Map;
 function init() : void {
 	var mapOverlays;
@@ -37,30 +36,63 @@ function drawApplications(geojson :  GeoJsonObject) : void {
 	map.addLayer(L.geoJSON(geojson, {
 		onEachFeature: (feature, layer) => {
 			if (feature.properties) {
-				layer.bindPopup(feature.properties.description + '<br><a href="' + feature.properties.url + '">More info</a>');
+				layer.bindPopup(createApplicationPopup(feature.properties));
 			}
 		} 
 	}));
 }
 
-class ServerDAO {
-	public static getApplications(latlng : LatLng, handler : Function) : void{
-		var xJSON : XMLHttpRequest = new XMLHttpRequest();
-		xJSON.overrideMimeType("application/json");
-		xJSON.open('GET', 'https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-get-app?' + 
-							'radius=0.5' + 
-							'&latitude=' + latlng.lat + 
-							'&longitude=' + latlng.lng, true);
-		xJSON.onreadystatechange = () => {
-			if (xJSON.readyState == 4 && xJSON.status == 200) {
-				console.log("GET-APP Response Text: " + xJSON.responseText);
-				var geoJson : GeoJsonObject = JSON.parse(xJSON.responseText);
-				handler(geoJson); 
-			} else {
-				console.log("GET-APP Failed: code = " + xJSON.status);
-				// TODO handle
-			}
-		};
-		xJSON.send();
+function createApplicationPopup(prop: GeoJsonProperties) : L.Popup {
+	var popup = new L.Popup();
+	if(prop === null) {
+		return L.popup().setContent('<p>This application doesn\' have any valid properties</p>');
+	} else {
+		var tmp: HTMLTemplateElement = $('#popupTemplate').get(0) as HTMLTemplateElement;
+		var maybePopupRoot = tmp.content.querySelector("div");
+		if(maybePopupRoot === null) {
+			console.log("No template found");
+			return L.popup().setContent('<p>This application doesn\' have any valid properties</p>');
+		} 
+
+		var x: HTMLElement = maybePopupRoot;
+		
+
+		console.log(tmp);
+		// var rl: HTMLElement = tmp.content.cloneNode().textContent;
+
+		return L.popup().setContent(x);
+		// console.log(prop.applications);
 	}
+
+	// console.log(prop);
+	// prop.applications;
+//feature.properties.description + '<br><a href="' + feature.properties.url + '">More info</a>'
+
+	// return new L.Popup();
+}
+
+class ServerDAO {
+
+	public static getApplications(latlng : LatLng, handler : Function) : void {
+		$.getJSON('https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-get-app',
+				{radius: 0.5, latitude: latlng.lat, longitude: latlng.lng})
+			.done((json) => { handler(json) })
+			.fail(() => { this.showErrorModal("Communication Error", "<p>Unable to get applications</p>") });
+	}
+
+	private static showErrorModal(title: string, body: string) {
+		$('#ErrorModalTitle').text(title);
+		$('#ErrorModalBody').html(body);
+		$('#ErrorModal').modal('show');
+	}
+
+}
+
+class ApplicationProperty  {
+	constructor(prop: GeoJsonProperties) {
+		if(prop !== null) {
+
+		}
+	}
+
 }

@@ -1,35 +1,54 @@
 
 <!DOCTYPE html>
 <html>
-<head>
-	
-	<title>BOLT Project</title>
+	<head>
+		
+		<title>BOLT Project</title>
 
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<link rel="stylesheet" 
-		href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" 
-		integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" crossorigin=""/>
-	
-	<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" 
-		integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" crossorigin="">
-	</script>
-	<script src=script.js> </script>
-	<link rel="stylesheet" type="text/css" href="style.css"/>
-</head>
-<body>
+		<link rel="stylesheet" 
+			href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" 
+			integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" crossorigin=""/>
+		
+		<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" 
+			integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" crossorigin="">
+		</script>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<script src=script.js> </script>
+		<link rel="stylesheet" type="text/css" href="style.css"/>
+	</head>
+	<body>
+		<div id='map'></div>	
+		<script>init();</script>
 
-<div id='map'></div>
-?
+		<div class="modal fade" id="ErrorModal" role="dialog">
+			<div class="modal-dialog modal-lg">
+			  <div class="modal-content">
+				<div class="modal-header">
+				  <h4 class="modal-title" id="ErrorModalTitle"></h4>
+				</div>
+				<div class="modal-body" id="ErrorModalBody"></div>
+				<div class="modal-footer">
+				  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			  </div>
+			</div>
+		</div>
 
-<script>
-	init();
-
-</script>
-
-
-
-</body>
+		<template id='popupTemplate'>
+			<div >
+				<ul class="pager">
+					<li class="previous disabled"><a href="#">&larr; Newer</a></li>
+					<li class="next"><a href="#">Older &rarr;</a></li>
+				</ul>
+				<p>Certificate of lawfulness (proposed) for single storey rear extension and rear dormer.</p>
+				<a href="http://publicaccess.nottinghamcity.gov.uk/online-applications/applicationDetails.do?activeTab=summary&keyVal=OJAPT7LYINR00">More info</a>
+			</div>
+		</template>
+	</body>
 </html>
 
