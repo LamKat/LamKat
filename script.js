@@ -58,6 +58,10 @@ function createApplicationPopup(a) {
                 .html(prop.map(buildApplicationText).join(''))
                 .find('.item:first').addClass('active');
             popup.find('.previous').hide();
+            popup.find('#showComments').bind('click', function () {
+                console.log("click");
+                $('#CommentModal').modal('show');
+            });
             popup.on('slid.bs.carousel', "", function () {
                 popup.find('li').show();
                 if (popup.find('.carousel-inner .item:last').hasClass('active')) {
@@ -77,6 +81,7 @@ function buildApplicationText(prop) {
     return '<div class="item">' +
         '		<p>' + prop.Description + '</p>' +
         '		<a href="' + prop.URL + '">More info</a>' +
+        '		<button id="showComments">Show Comments</button>' +
         '	</div>';
 }
 var ServerDAO = /** @class */ (function () {
@@ -84,7 +89,7 @@ var ServerDAO = /** @class */ (function () {
     }
     ServerDAO.getApplications = function (latlng, handler) {
         var _this = this;
-        $.getJSON('https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-get-app1', { radius: 0.5, latitude: latlng.lat, longitude: latlng.lng })
+        $.getJSON('https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-get-app', { radius: 0.5, latitude: latlng.lat, longitude: latlng.lng })
             .done(function (json) { handler(json); })
             .fail(function () { _this.showErrorModal("Communication Error", "<p>Unable to get applications</p>"); });
     };

@@ -39,24 +39,95 @@
 			</div>
 		</div>
 
-		<template id='popupTemplate'>
-				<h2>Carousel Example</h2>  
-				<div id="myCarousel" class="carousel slide" data-wrap="false">			  
-				  <ul class="pager">
-					<li class="previous disabled"><a href="#myCarousel" data-slide="prev">&larr; Newer</a></li>
-					<li class="next"><a href="#myCarousel" data-slide="next">Older &rarr;</a></li>
-				  </ul>
-				  <div class="carousel-inner"></div>
+		<div class="modal fade" id="CommentModal" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+					<h4 class="modal-title" id="ApplicationDescription">Details submitted to discharge condition 8 (verification report) of planning permission reference 17/00791/PFUL3</h4>
+					</div>
+					<div class="modal-body" id="Comments">
+						<div class="card">
+							<div class="card-block">
+								<h6 class="card-subtitle mb-2 text-muted">Stephen</h6>
+								<p class="card-text">I really like this application</p>
+							</div>
+						</div>
+						<div class="card">
+							<div class="card-block">
+								<h6 class="card-subtitle mb-2 text-muted">Jack</h6>
+								<p class="card-text">I think this needs to be looked at again</p>
+							</div>
+						</div>
+						<div class="card">
+							<div class="card-block">
+								<h6 class="card-subtitle mb-2 text-muted">Jack</h6>
+								<p class="card-text">I think this needs to be looked at again</p>
+							</div>
+						</div>
+						<div class="card">
+							<div class="card-block">
+								<h6 class="card-subtitle mb-2 text-muted">Jack</h6>
+								<p class="card-text">I think this needs to be looked at again</p>
+							</div>
+						</div>
+						<div class="card">
+							<div class="card-block">
+								<h6 class="card-subtitle mb-2 text-muted">Jack</h6>
+								<p class="card-text">I think this needs to be looked at again</p>
+							</div>
+						</div>
+						<div class="card">
+							<div class="card-block">
+								<h6 class="card-subtitle mb-2 text-muted">Jack</h6>
+								<p class="card-text">I think this needs to be looked at again</p>
+							</div>
+						</div>
+						<div class="card">
+							<div class="card-block">
+								<h6 class="card-subtitle mb-2 text-muted">Jack</h6>
+								<p class="card-text">I think this needs to be looked at again</p>
+							</div>
+						</div>
+						<div class="card">
+							<div class="card-block">
+								<h6 class="card-subtitle mb-2 text-muted">Jack</h6>
+								<p class="card-text">I think this needs to be looked at again</p>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" id="addComment">Add Comment</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
 				</div>
-		</template>
-
-
-		<template id="popupContentTemplate">
-			<div class="item">
-				<p id='popupText'></p>
-				<a id='popupLink' href="">More info</a>
 			</div>
-		</template>
+		</div>
+
+
+		<div class="modal fade" id="AddCommentModal" role="dialog">
+			<div class="modal-body" id="AddComment">
+				<form>
+					<div class="form-group row">
+						<label for="name" class="col-sm-3 col-form-label">Display name</label>
+						<div class="col-sm-9">
+							<input type="text" class="form-control" id="name" placeholder="Display Name">
+						</div>
+					</div>
+					<small class="form-text text-muted">If you want to receave updates on this application, please provide an email address.</small>
+					<div class="form-group row">
+						<label for="email" class="col-sm-3 col-form-label">Email</label>
+						<div class="col-sm-9">
+							<input type="text" class="form-control" id="email" placeholder="Email (optional)">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="comment">Comment</label>
+						<input type="text" class="form-control" id="comment" placeholder="Comment">
+					</div>
+					<button type="submit" class="btn btn-primary">Submit</button>
+				</form>
+			</div>
+		</div>
 	</body>
 </html>
 

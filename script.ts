@@ -66,6 +66,11 @@ function createApplicationPopup(a: any) : L.Popup {
 				.html(prop.map(buildApplicationText).join(''))
 				.find('.item:first').addClass('active');
 			popup.find('.previous').hide();
+			popup.find('#showComments').bind('click', () => {
+				console.log("click");
+				$('#CommentModal').modal('show');
+
+			})
 
 			popup.on('slid.bs.carousel', "", ()  => {
 				popup.find('li').show();
@@ -90,13 +95,14 @@ function buildApplicationText(prop: Application) : string {
 	return '<div class="item">' +
 	'		<p>' + prop.Description +'</p>' +
 	'		<a href="' + prop.URL + '">More info</a>' +
+	'		<button id="showComments">Show Comments</button>' + 
 	'	</div>' ;
 }
 
 class ServerDAO {
 
 	public static getApplications(latlng : LatLng, handler : Function) : void {
-		$.getJSON('https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-get-app1',
+		$.getJSON('https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-get-app',
 				{radius: 0.5, latitude: latlng.lat, longitude: latlng.lng})
 			.done((json) => { handler(json) })
 			.fail(() => { this.showErrorModal("Communication Error", "<p>Unable to get applications</p>") });
