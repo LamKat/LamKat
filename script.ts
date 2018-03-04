@@ -44,46 +44,49 @@ function drawApplications(geojson :  GeoJsonObject) : void {
 
 function createApplicationPopup(a: any) : L.Popup {
 	var prop: Application[] = a.applications;
-	var popup: HTMLElement = document.createElement('div');
+	var popup: JQuery<HTMLElement>;
 	switch (prop.length) {
 		case 0:
-			//TODO handle
-			break;
+			throw "Data returned from server doesn't contain any applications for a geo feature";
 		case 1:
-			popup = $($.parseHTML(f(prop[0]))).get(0);
+			popup = $($.parseHTML(buildApplicationText(prop[0])));
 			break;
 		default:
-			var s: string = '<div id="myCarousel" class="carousel slide" data-wrap="false" data-interval="false">' +
+			var s: string = 
+			'<div id="applicationCarousel" class="carousel slide" data-wrap="false" data-interval="false">' +
+			'  <div class="carousel-inner"></div>' +
 			'  <ul class="pager">' +
-			'	<li class="previous"><a href="#myCarousel" data-slide="prev">&larr; Newer</a></li>' +
-			'	<li class="next"><a href="#myCarousel" data-slide="next">Older &rarr;</a></li>' +
+			'	<li class="previous"><a href="#applicationCarousel" data-slide="prev">&larr; Newer</a></li>' +
+			'	<li class="next"><a href="#applicationCarousel" data-slide="next">Older &rarr;</a></li>' +
 			'  </ul>' +
-			'  <div class="carousel-inner">' +
-			'  </div>' +
 			'</div>';
 	
-			var elm = $($.parseHTML(s));
-			var inner = elm.find('.carousel-inner');
-			for(var i = 0; i < prop.length; i++) {
-				inner.append(f(prop[i]));
-			}
-			inner.find('.item:first').addClass('active');
-			elm.find('.previous').hide();
-			elm.on('slid.bs.carousel', "", ()  => {
-				elm.find('li').show();
-				if(elm.find('.carousel-inner .item:last').hasClass('active')) {
-					elm.find('.next').hide();
-				} else if(elm.find('.carousel-inner .item:first').hasClass('active')) {
-					elm.find('.previous').hide();
+			var popup = $($.parseHTML(s));
+			popup.find('.carousel-inner')
+				.html(prop.map(buildApplicationText).join(''))
+				.find('.item:first').addClass('active');
+			popup.find('.previous').hide();
+
+			popup.on('slid.bs.carousel', "", ()  => {
+				popup.find('li').show();
+				if(popup.find('.carousel-inner .item:last').hasClass('active')) {
+					popup.find('.next').hide();
+				} else if(popup.find('.carousel-inner .item:first').hasClass('active')) {
+					popup.find('.previous').hide();
 				} 
 			});
-			popup = elm.get(0);
 	}
-	return L.popup().setContent(popup);
+	return L.popup().setContent(popup.get(0));
 
 }
 
-function f(prop: Application) : string {
+function buildApplicationText(prop: Application) : string {
+	if(prop.Comments !== null) {
+
+		console.log(prop.Comments);
+	}
+
+
 	return '<div class="item">' +
 	'		<p>' + prop.Description +'</p>' +
 	'		<a href="' + prop.URL + '">More info</a>' +
@@ -93,7 +96,7 @@ function f(prop: Application) : string {
 class ServerDAO {
 
 	public static getApplications(latlng : LatLng, handler : Function) : void {
-		$.getJSON('https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-get-app',
+		$.getJSON('https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-get-app1',
 				{radius: 0.5, latitude: latlng.lat, longitude: latlng.lng})
 			.done((json) => { handler(json) })
 			.fail(() => { this.showErrorModal("Communication Error", "<p>Unable to get applications</p>") });
@@ -111,5 +114,11 @@ interface Application {
 	Reference: string;
 	Description: string;
 	URL: string;
-	Comments?: any;
+	ID: number;
+	Comments?: Comment[];
+}
+
+interface Comment {
+	Comment: string;
+	Name: string;
 }

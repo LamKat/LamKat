@@ -38,44 +38,42 @@ function drawApplications(geojson) {
 }
 function createApplicationPopup(a) {
     var prop = a.applications;
-    var popup = document.createElement('div');
+    var popup;
     switch (prop.length) {
         case 0:
-            //TODO handle
-            break;
+            throw "Data returned from server doesn't contain any applications for a geo feature";
         case 1:
-            popup = $($.parseHTML(f(prop[0]))).get(0);
+            popup = $($.parseHTML(buildApplicationText(prop[0])));
             break;
         default:
-            var s = '<div id="myCarousel" class="carousel slide" data-wrap="false" data-interval="false">' +
+            var s = '<div id="applicationCarousel" class="carousel slide" data-wrap="false" data-interval="false">' +
+                '  <div class="carousel-inner"></div>' +
                 '  <ul class="pager">' +
-                '	<li class="previous"><a href="#myCarousel" data-slide="prev">&larr; Newer</a></li>' +
-                '	<li class="next"><a href="#myCarousel" data-slide="next">Older &rarr;</a></li>' +
+                '	<li class="previous"><a href="#applicationCarousel" data-slide="prev">&larr; Newer</a></li>' +
+                '	<li class="next"><a href="#applicationCarousel" data-slide="next">Older &rarr;</a></li>' +
                 '  </ul>' +
-                '  <div class="carousel-inner">' +
-                '  </div>' +
                 '</div>';
-            var elm = $($.parseHTML(s));
-            var inner = elm.find('.carousel-inner');
-            for (var i = 0; i < prop.length; i++) {
-                inner.append(f(prop[i]));
-            }
-            inner.find('.item:first').addClass('active');
-            elm.find('.previous').hide();
-            elm.on('slid.bs.carousel', "", function () {
-                elm.find('li').show();
-                if (elm.find('.carousel-inner .item:last').hasClass('active')) {
-                    elm.find('.next').hide();
+            var popup = $($.parseHTML(s));
+            popup.find('.carousel-inner')
+                .html(prop.map(buildApplicationText).join(''))
+                .find('.item:first').addClass('active');
+            popup.find('.previous').hide();
+            popup.on('slid.bs.carousel', "", function () {
+                popup.find('li').show();
+                if (popup.find('.carousel-inner .item:last').hasClass('active')) {
+                    popup.find('.next').hide();
                 }
-                else if (elm.find('.carousel-inner .item:first').hasClass('active')) {
-                    elm.find('.previous').hide();
+                else if (popup.find('.carousel-inner .item:first').hasClass('active')) {
+                    popup.find('.previous').hide();
                 }
             });
-            popup = elm.get(0);
     }
-    return L.popup().setContent(popup);
+    return L.popup().setContent(popup.get(0));
 }
-function f(prop) {
+function buildApplicationText(prop) {
+    if (prop.Comments !== null) {
+        console.log(prop.Comments);
+    }
     return '<div class="item">' +
         '		<p>' + prop.Description + '</p>' +
         '		<a href="' + prop.URL + '">More info</a>' +
@@ -86,7 +84,7 @@ var ServerDAO = /** @class */ (function () {
     }
     ServerDAO.getApplications = function (latlng, handler) {
         var _this = this;
-        $.getJSON('https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-get-app', { radius: 0.5, latitude: latlng.lat, longitude: latlng.lng })
+        $.getJSON('https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-get-app1', { radius: 0.5, latitude: latlng.lat, longitude: latlng.lng })
             .done(function (json) { handler(json); })
             .fail(function () { _this.showErrorModal("Communication Error", "<p>Unable to get applications</p>"); });
     };
