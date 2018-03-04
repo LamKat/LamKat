@@ -36,43 +36,28 @@ function drawApplications(geojson :  GeoJsonObject) : void {
 	map.addLayer(L.geoJSON(geojson, {
 		onEachFeature: (feature, layer) => {
 			if (feature.properties) {
-				layer.bindPopup(createApplicationPopup(feature.properties));
+				layer.bindPopup(() => {return createApplicationPopup(feature.properties)}, {minWidth: 300});
 			}
 		} 
 	}));
 }
 
-function createApplicationPopup(a: any) : L.Popup {
+function createApplicationPopup(a: any) : L.Content {
 	var prop: Application[] = a.applications;
 	var popup: JQuery<HTMLElement>;
 	switch (prop.length) {
 		case 0:
 			throw "Data returned from server doesn't contain any applications for a geo feature";
 		case 1:
-			popup = $($.parseHTML(buildApplicationText(prop[0])));
+			popup = buildApplicationText(prop[0]);
 			break;
 		default:
-			var s: string = 
-			'<div id="applicationCarousel" class="carousel slide" data-wrap="false" data-interval="false">' +
-			'  <div class="carousel-inner"></div>' +
-			'  <ul class="pager">' +
-			'	<li class="previous"><a href="#applicationCarousel" data-slide="prev">&larr; Newer</a></li>' +
-			'	<li class="next"><a href="#applicationCarousel" data-slide="next">Older &rarr;</a></li>' +
-			'  </ul>' +
-			'</div>';
-	
-			var popup = $($.parseHTML(s));
-			popup.find('.carousel-inner')
-				.html(prop.map(buildApplicationText).join(''))
-				.find('.item:first').addClass('active');
-			popup.find('.previous').hide();
-			popup.find('#showComments').bind('click', () => {
-				console.log("click");
-				$('#CommentModal').modal('show');
+			popup = fromTemplate('#popupCarousel');
+			popup.find('.carousel-inner').append(prop.map(buildApplicationText));
+			popup.find('.item:first').addClass('active');
+			// popup.find('.previous').hide();
 
-			})
-
-			popup.on('slid.bs.carousel', "", ()  => {
+			popup.bind('slid.bs.carousel', ()  => {
 				popup.find('li').show();
 				if(popup.find('.carousel-inner .item:last').hasClass('active')) {
 					popup.find('.next').hide();
@@ -81,22 +66,63 @@ function createApplicationPopup(a: any) : L.Popup {
 				} 
 			});
 	}
-	return L.popup().setContent(popup.get(0));
+	return popup.get(0);
 
 }
 
-function buildApplicationText(prop: Application) : string {
-	if(prop.Comments !== null) {
+function buildApplicationText(prop: Application) : JQuery<HTMLElement>{
+	var template = $('#popupText').get(0) as HTMLTemplateElement;
+	var popup = $(template.content.cloneNode(true));
+	popup.find('#refrence').text(prop.Reference);
+	popup.find('#description').text(prop.Description);
+	popup.find('#URL').click(() => {
+		window.open(prop.URL, '_blank');
+	});
 
-		console.log(prop.Comments);
+	if(prop.Comments !== null && prop.Comments !== undefined) { //Shout out to typescript, what a guy
+		var c : Comment[] = prop.Comments;
+		popup.find('#commentText')
+			.text('view ' + c.length + ' comments')
+			.click(() => showComments(prop.Description, prop.ID, c));
+	} else {
+		popup.find('#commentText')
+			.text('Add first comment')
+			.click(() => showAddComment(prop.ID, prop.Description));
 	}
+	return popup;
+}
 
+function showComments(description: string, id: number, comments: Comment[]) {
+	var modal = $('#CommentModal');
+	modal.find('#ApplicationDescription').text(description);
+	modal.find('#Comments')
+		.empty()
+		.append(comments.map((comment: Comment) => {
+			var card = fromTemplate("#commentCardTemplate");
+			card.find('#name').text(comment.Name);
+			card.find('#comment').text(comment.Comment);
+			return card;
+		}));
+	modal.find('#addComment').click(() => {
+		modal.modal('hide');
+		showAddComment(id, description);
+	});
+	modal.modal('show');
+}
 
-	return '<div class="item">' +
-	'		<p>' + prop.Description +'</p>' +
-	'		<a href="' + prop.URL + '">More info</a>' +
-	'		<button id="showComments">Show Comments</button>' + 
-	'	</div>' ;
+function showAddComment(id: number, description: string) {
+	var modal = $('#AddCommentModal');
+	if(modal.find("#id").attr('value') !== id.toString()) {
+		modal.find("#id").attr('value', id);
+		modal.find('#comment').val('');
+	}
+	modal.find('#ApplicationDescription').text(description);
+	modal.modal('show');
+}
+
+function fromTemplate(id: string) : JQuery<HTMLElement>{
+	var template = $(id).get(0) as HTMLTemplateElement;
+	return $(template.content.cloneNode(true));
 }
 
 class ServerDAO {
@@ -115,6 +141,7 @@ class ServerDAO {
 	}
 
 }
+
 
 interface Application {
 	Reference: string;

@@ -31,7 +31,7 @@ function drawApplications(geojson) {
     map.addLayer(L.geoJSON(geojson, {
         onEachFeature: function (feature, layer) {
             if (feature.properties) {
-                layer.bindPopup(createApplicationPopup(feature.properties));
+                layer.bindPopup(function () { return createApplicationPopup(feature.properties); }, { minWidth: 300 });
             }
         }
     }));
@@ -43,26 +43,14 @@ function createApplicationPopup(a) {
         case 0:
             throw "Data returned from server doesn't contain any applications for a geo feature";
         case 1:
-            popup = $($.parseHTML(buildApplicationText(prop[0])));
+            popup = buildApplicationText(prop[0]);
             break;
         default:
-            var s = '<div id="applicationCarousel" class="carousel slide" data-wrap="false" data-interval="false">' +
-                '  <div class="carousel-inner"></div>' +
-                '  <ul class="pager">' +
-                '	<li class="previous"><a href="#applicationCarousel" data-slide="prev">&larr; Newer</a></li>' +
-                '	<li class="next"><a href="#applicationCarousel" data-slide="next">Older &rarr;</a></li>' +
-                '  </ul>' +
-                '</div>';
-            var popup = $($.parseHTML(s));
-            popup.find('.carousel-inner')
-                .html(prop.map(buildApplicationText).join(''))
-                .find('.item:first').addClass('active');
-            popup.find('.previous').hide();
-            popup.find('#showComments').bind('click', function () {
-                console.log("click");
-                $('#CommentModal').modal('show');
-            });
-            popup.on('slid.bs.carousel', "", function () {
+            popup = fromTemplate('#popupCarousel');
+            popup.find('.carousel-inner').append(prop.map(buildApplicationText));
+            popup.find('.item:first').addClass('active');
+            // popup.find('.previous').hide();
+            popup.bind('slid.bs.carousel', function () {
                 popup.find('li').show();
                 if (popup.find('.carousel-inner .item:last').hasClass('active')) {
                     popup.find('.next').hide();
@@ -72,17 +60,58 @@ function createApplicationPopup(a) {
                 }
             });
     }
-    return L.popup().setContent(popup.get(0));
+    return popup.get(0);
 }
 function buildApplicationText(prop) {
-    if (prop.Comments !== null) {
-        console.log(prop.Comments);
+    var template = $('#popupText').get(0);
+    var popup = $(template.content.cloneNode(true));
+    popup.find('#refrence').text(prop.Reference);
+    popup.find('#description').text(prop.Description);
+    popup.find('#URL').click(function () {
+        window.open(prop.URL, '_blank');
+    });
+    if (prop.Comments !== null && prop.Comments !== undefined) {
+        var c = prop.Comments;
+        popup.find('#commentText')
+            .text('view ' + c.length + ' comments')
+            .click(function () { return showComments(prop.Description, prop.ID, c); });
     }
-    return '<div class="item">' +
-        '		<p>' + prop.Description + '</p>' +
-        '		<a href="' + prop.URL + '">More info</a>' +
-        '		<button id="showComments">Show Comments</button>' +
-        '	</div>';
+    else {
+        popup.find('#commentText')
+            .text('Add first comment')
+            .click(function () { return showAddComment(prop.ID, prop.Description); });
+    }
+    return popup;
+}
+function showComments(description, id, comments) {
+    var modal = $('#CommentModal');
+    modal.find('#ApplicationDescription').text(description);
+    modal.find('#Comments')
+        .empty()
+        .append(comments.map(function (comment) {
+        var card = fromTemplate("#commentCardTemplate");
+        card.find('#name').text(comment.Name);
+        card.find('#comment').text(comment.Comment);
+        return card;
+    }));
+    modal.find('#addComment').click(function () {
+        modal.modal('hide');
+        showAddComment(id, description);
+    });
+    modal.modal('show');
+}
+function showAddComment(id, description) {
+    var modal = $('#AddCommentModal');
+    if (modal.find("#id").attr('value') !== id.toString()) {
+        modal.find("#id").attr('value', id);
+        modal.find('#comment').val('');
+    }
+    modal.find('#ApplicationDescription').text(description);
+    modal.modal('show');
+}
+function fromTemplate(id) {
+    var template = $(id).get(0);
+    return $(template.content.cloneNode(true));
 }
 var ServerDAO = /** @class */ (function () {
     function ServerDAO() {

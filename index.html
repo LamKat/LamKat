@@ -39,62 +39,14 @@
 			</div>
 		</div>
 
+
 		<div class="modal fade" id="CommentModal" role="dialog">
 			<div class="modal-dialog modal-lg">
 				<div class="modal-content">
 					<div class="modal-header">
-					<h4 class="modal-title" id="ApplicationDescription">Details submitted to discharge condition 8 (verification report) of planning permission reference 17/00791/PFUL3</h4>
+					<h4 class="modal-title" id="ApplicationDescription"></h4>
 					</div>
-					<div class="modal-body" id="Comments">
-						<div class="card">
-							<div class="card-block">
-								<h6 class="card-subtitle mb-2 text-muted">Stephen</h6>
-								<p class="card-text">I really like this application</p>
-							</div>
-						</div>
-						<div class="card">
-							<div class="card-block">
-								<h6 class="card-subtitle mb-2 text-muted">Jack</h6>
-								<p class="card-text">I think this needs to be looked at again</p>
-							</div>
-						</div>
-						<div class="card">
-							<div class="card-block">
-								<h6 class="card-subtitle mb-2 text-muted">Jack</h6>
-								<p class="card-text">I think this needs to be looked at again</p>
-							</div>
-						</div>
-						<div class="card">
-							<div class="card-block">
-								<h6 class="card-subtitle mb-2 text-muted">Jack</h6>
-								<p class="card-text">I think this needs to be looked at again</p>
-							</div>
-						</div>
-						<div class="card">
-							<div class="card-block">
-								<h6 class="card-subtitle mb-2 text-muted">Jack</h6>
-								<p class="card-text">I think this needs to be looked at again</p>
-							</div>
-						</div>
-						<div class="card">
-							<div class="card-block">
-								<h6 class="card-subtitle mb-2 text-muted">Jack</h6>
-								<p class="card-text">I think this needs to be looked at again</p>
-							</div>
-						</div>
-						<div class="card">
-							<div class="card-block">
-								<h6 class="card-subtitle mb-2 text-muted">Jack</h6>
-								<p class="card-text">I think this needs to be looked at again</p>
-							</div>
-						</div>
-						<div class="card">
-							<div class="card-block">
-								<h6 class="card-subtitle mb-2 text-muted">Jack</h6>
-								<p class="card-text">I think this needs to be looked at again</p>
-							</div>
-						</div>
-					</div>
+					<div class="modal-body" id="Comments"></div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-default" id="addComment">Add Comment</button>
 						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -103,31 +55,76 @@
 			</div>
 		</div>
 
+		<template id="commentCardTemplate">
+			<div class="card">
+				<div class="card-block">
+					<h6 class="card-subtitle mb-2 text-muted" id="name">Stephen</h6>
+					<p class="card-text" id='comment'>I really like this application</p>
+				</div>
+			</div>
+		</template>
 
 		<div class="modal fade" id="AddCommentModal" role="dialog">
-			<div class="modal-body" id="AddComment">
-				<form>
-					<div class="form-group row">
-						<label for="name" class="col-sm-3 col-form-label">Display name</label>
-						<div class="col-sm-9">
-							<input type="text" class="form-control" id="name" placeholder="Display Name">
-						</div>
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title" id="ApplicationDescription"></h4>
 					</div>
-					<small class="form-text text-muted">If you want to receave updates on this application, please provide an email address.</small>
-					<div class="form-group row">
-						<label for="email" class="col-sm-3 col-form-label">Email</label>
-						<div class="col-sm-9">
-							<input type="text" class="form-control" id="email" placeholder="Email (optional)">
-						</div>
+					<div class="modal-body" id="AddComment">
+						<form action="https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-comment-app" method="POST">
+
+							<div class="form-group">
+								<label class="col-form-label">Display name</label>
+								<input type="text" class="form-control" id="name" placeholder="Display Name" name="name" required>
+							</div>
+							<div class="form-group">
+								<label class="col-form-label">Email</label>
+								<input type="text" class="form-control" id="email" placeholder="Email (optional)" name="email">
+								<small class="form-text text-muted">If you wish to receave updates when someone else comments on this application, 
+									please provide an email address, otherwise leave blank</small>
+							</div>
+							<div class="form-group">
+								<label>Comment</label>
+								<textarea class="form-control" id="comment" rows="3" placeholder="Comment" name="comment" required></textarea>
+							</div>
+							<input type="hidden" name="application" id="id">
+							<div style="text-align: right;">
+								<button type="submit" class="btn btn-primary" >Submit</button>
+							</div>
+
+						</form>
 					</div>
-					<div class="form-group">
-						<label for="comment">Comment</label>
-						<input type="text" class="form-control" id="comment" placeholder="Comment">
-					</div>
-					<button type="submit" class="btn btn-primary">Submit</button>
-				</form>
+				</div>
 			</div>
 		</div>
+		<template id="popupText">
+			<div class="item">
+				<div class="card-block">
+					<h6 class="card-subtitle mb-2 text-muted" id='refrence'></h6>
+					<p class="card-text" id="description"></p>
+						<button type="button" class="btn btn-default btn-block" id="URL">
+							<span class="glyphicon glyphicon-link" aria-hidden="true"></span>
+							View on LPA site
+						</button>
+
+						<button type="button" class="btn btn-default btn-block" id="comments">
+							<span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
+							<span id="commentText"></span>
+						</button>
+				</div>
+			</div>
+		</template>
+
+		<template id="popupCarousel">
+			<div id="applicationCarousel" class="carousel slide" data-wrap="false" data-interval="false">
+				<div class="carousel-inner"></div>
+				<ul class="pager">
+					<li class="previous"><a href="#applicationCarousel" data-slide="prev">&larr; Newer</a></li>
+					<li class="next"><a href="#applicationCarousel" data-slide="next">Older &rarr;</a></li>
+				</ul>
+			</div>
+		</template>
+		
 	</body>
 </html>
 
