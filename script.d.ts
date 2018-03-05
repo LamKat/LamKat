@@ -2,6 +2,7 @@ import * as Leafletjs from "leaflet";
 import { 
     LeafletEvent as _LeafletEvent, 
     LocationEvent as _LocationEvent, 
+    LeafletMouseEvent as _LeafletMouseEvent,
     Map as _Map, 
     LatLng as _LatLng, 
     geoJSON as _geoJSON
@@ -16,6 +17,7 @@ declare global {
     const leaflet: typeof Leafletjs;
     type LeafletEvent = _LeafletEvent;
     type LocationEvent = _LocationEvent;
+    type LeafletMouseEvent = _LeafletMouseEvent;
     type Map = _Map;
     type LatLng = _LatLng;
     type GeoJsonObject = _GeoJsonObject;

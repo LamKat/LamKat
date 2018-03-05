@@ -1,5 +1,6 @@
 /// <reference path="script.d.ts" />
 
+
 var map : Map;
 function init() : void {
 	var mapOverlays;
@@ -14,6 +15,13 @@ function init() : void {
 
 	map.on('locationfound', onLocationFound);
 	map.on('locationerror', onLocationError);
+	map.doubleClickZoom.disable();
+	map.on('dblclick', (a: LeafletEvent) => {
+		var f : LeafletMouseEvent = a as LeafletMouseEvent;
+		map.panTo(f.latlng)
+		ServerDAO.getApplications(f.latlng, drawApplications);
+	})
+
 	map.locate({setView: true, maxZoom: 16});
 }
 
@@ -52,10 +60,10 @@ function createApplicationPopup(a: any) : L.Content {
 			popup = buildApplicationText(prop[0]);
 			break;
 		default:
-			popup = fromTemplate('#popupCarousel');
+			popup = fromTemplate('#popupCarousel').find('#applicationCarousel');
 			popup.find('.carousel-inner').append(prop.map(buildApplicationText));
 			popup.find('.item:first').addClass('active');
-			// popup.find('.previous').hide();
+			popup.find('.previous').hide();
 
 			popup.bind('slid.bs.carousel', ()  => {
 				popup.find('li').show();
@@ -81,11 +89,11 @@ function buildApplicationText(prop: Application) : JQuery<HTMLElement>{
 
 	if(prop.Comments !== null && prop.Comments !== undefined) { //Shout out to typescript, what a guy
 		var c : Comment[] = prop.Comments;
-		popup.find('#commentText')
+		popup.find('#comments')
 			.text('view ' + c.length + ' comments')
 			.click(() => showComments(prop.Description, prop.ID, c));
 	} else {
-		popup.find('#commentText')
+		popup.find('#comments')
 			.text('Add first comment')
 			.click(() => showAddComment(prop.ID, prop.Description));
 	}
@@ -128,9 +136,10 @@ function fromTemplate(id: string) : JQuery<HTMLElement>{
 class ServerDAO {
 
 	public static getApplications(latlng : LatLng, handler : Function) : void {
+		this.showLoadingModal();
 		$.getJSON('https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-get-app',
 				{radius: 0.5, latitude: latlng.lat, longitude: latlng.lng})
-			.done((json) => { handler(json) })
+			.done((json) => { this.hideLoadingModal(); handler(json) })
 			.fail(() => { this.showErrorModal("Communication Error", "<p>Unable to get applications</p>") });
 	}
 
@@ -138,6 +147,14 @@ class ServerDAO {
 		$('#ErrorModalTitle').text(title);
 		$('#ErrorModalBody').html(body);
 		$('#ErrorModal').modal('show');
+	}
+
+	private static showLoadingModal() {
+		$('#spinnerModal').modal("show");
+	}
+
+	private static hideLoadingModal() {
+		$('#spinnerModal').modal("hide");
 	}
 
 }

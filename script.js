@@ -12,6 +12,12 @@ function init() {
     }).addTo(map);
     map.on('locationfound', onLocationFound);
     map.on('locationerror', onLocationError);
+    map.doubleClickZoom.disable();
+    map.on('dblclick', function (a) {
+        var f = a;
+        map.panTo(f.latlng);
+        ServerDAO.getApplications(f.latlng, drawApplications);
+    });
     map.locate({ setView: true, maxZoom: 16 });
 }
 function onLocationError(e) {
@@ -46,10 +52,10 @@ function createApplicationPopup(a) {
             popup = buildApplicationText(prop[0]);
             break;
         default:
-            popup = fromTemplate('#popupCarousel');
+            popup = fromTemplate('#popupCarousel').find('#applicationCarousel');
             popup.find('.carousel-inner').append(prop.map(buildApplicationText));
             popup.find('.item:first').addClass('active');
-            // popup.find('.previous').hide();
+            popup.find('.previous').hide();
             popup.bind('slid.bs.carousel', function () {
                 popup.find('li').show();
                 if (popup.find('.carousel-inner .item:last').hasClass('active')) {
@@ -72,12 +78,12 @@ function buildApplicationText(prop) {
     });
     if (prop.Comments !== null && prop.Comments !== undefined) {
         var c = prop.Comments;
-        popup.find('#commentText')
+        popup.find('#comments')
             .text('view ' + c.length + ' comments')
             .click(function () { return showComments(prop.Description, prop.ID, c); });
     }
     else {
-        popup.find('#commentText')
+        popup.find('#comments')
             .text('Add first comment')
             .click(function () { return showAddComment(prop.ID, prop.Description); });
     }
@@ -118,14 +124,21 @@ var ServerDAO = /** @class */ (function () {
     }
     ServerDAO.getApplications = function (latlng, handler) {
         var _this = this;
+        this.showLoadingModal();
         $.getJSON('https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-get-app', { radius: 0.5, latitude: latlng.lat, longitude: latlng.lng })
-            .done(function (json) { handler(json); })
+            .done(function (json) { _this.hideLoadingModal(); handler(json); })
             .fail(function () { _this.showErrorModal("Communication Error", "<p>Unable to get applications</p>"); });
     };
     ServerDAO.showErrorModal = function (title, body) {
         $('#ErrorModalTitle').text(title);
         $('#ErrorModalBody').html(body);
         $('#ErrorModal').modal('show');
+    };
+    ServerDAO.showLoadingModal = function () {
+        $('#spinnerModal').modal("show");
+    };
+    ServerDAO.hideLoadingModal = function () {
+        $('#spinnerModal').modal("hide");
     };
     return ServerDAO;
 }());
