@@ -1,6 +1,4 @@
 /// <reference path="script.d.ts" />
-
-
 var map : Map;
 function init() : void {
 	var mapOverlays;
@@ -18,26 +16,23 @@ function init() : void {
 	map.doubleClickZoom.disable();
 	map.setMinZoom(15);
 
-	var gotoAndLoad =  (a: LeafletEvent) => {
+	
+	map.on('contextmenu', (a: LeafletEvent) => {
 			var f : LeafletMouseEvent = a as LeafletMouseEvent;
 			map.panTo(f.latlng);
 			ServerDAO.getApplications(f.latlng, drawApplications);
-		}
-	map.on('touchstart', () => {
-		map.off('touchstart');
-		map.on('contextmenu', gotoAndLoad);
-	});
-	map.on('tap', gotoAndLoad);
-	map.on('dblclick', gotoAndLoad);
+		});
 
 	map.locate({setView: true, maxZoom: 16});
 }
 
 function onLocationError(e : LeafletEvent) : void {
-	console.log("Location not found");
-	/*
-		Display Location error
-	*/
+	$('#ErrorModalTitle').text("Location Error");
+	$('#ErrorModalBody').html("<p>Unable to get device location. Please enable location</p>");
+	$('#ErrorModal').modal('show');
+	var defaultLatLng: LatLng = new L.LatLng(52.93631488220747, 1.1357331275939944);
+	map.panTo(defaultLatLng);
+	ServerDAO.getApplications(defaultLatLng, drawApplications);
 }
 
 function onLocationFound(e : LeafletEvent) : void {
@@ -99,18 +94,18 @@ function buildApplicationText(prop: Application) : JQuery<HTMLElement>{
 		var c : Comment[] = prop.Comments;
 		popup.find('#comments')
 			.text('view ' + c.length + ' comments')
-			.click(() => showComments(prop.Description, prop.ID, c));
+			.click(() => showComments(prop, c));
 	} else {
 		popup.find('#comments')
 			.text('Add first comment')
-			.click(() => showAddComment(prop.ID, prop.Description));
+			.click(() => showAddComment(prop));
 	}
 	return popup;
 }
 
-function showComments(description: string, id: number, comments: Comment[]) {
+function showComments(prop: Application, comments: Comment[]) {
 	var modal = $('#CommentModal');
-	modal.find('#ApplicationDescription').text(description);
+	modal.find('#ApplicationDescription').text(prop.Description);
 	modal.find('#Comments')
 		.empty()
 		.append(comments.map((comment: Comment) => {
@@ -121,18 +116,32 @@ function showComments(description: string, id: number, comments: Comment[]) {
 		}));
 	modal.find('#addComment').click(() => {
 		modal.modal('hide');
-		showAddComment(id, description);
+		showAddComment(prop);
 	});
 	modal.modal('show');
 }
 
-function showAddComment(id: number, description: string) {
+function showAddComment(prop: Application) {
 	var modal = $('#AddCommentModal');
-	if(modal.find("#id").attr('value') !== id.toString()) {
-		modal.find("#id").attr('value', id);
+	if(modal.find("#id").attr('value') !== prop.ID.toString()) {
+		modal.find("#id").attr('value', prop.ID);
 		modal.find('#comment').val('');
 	}
-	modal.find('#ApplicationDescription').text(description);
+	modal.find('#ApplicationDescription').text(prop.Description);
+	var form = modal.find('form:first');
+	form.off('submit');
+	form.submit((e) => {
+		if(!prop.Comments) 
+			prop.Comments = [];
+		prop.Comments.push({
+			Comment: form.find('#comment').val() as string,
+			Name: form.find('#name').val() as string
+		} as Comment);
+		map.closePopup();
+		modal.modal('hide');
+		ServerDAO.postComment(form.serialize());
+		e.preventDefault();
+	});
 	modal.modal('show');
 }
 
@@ -147,14 +156,24 @@ class ServerDAO {
 		this.showLoadingModal();
 		$.getJSON('https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-get-app',
 				{radius: 0.5, latitude: latlng.lat, longitude: latlng.lng})
-			.done((json) => { this.hideLoadingModal(); handler(json) })
-			.fail(() => { this.showErrorModal("Communication Error", "<p>Unable to get applications</p>") });
+			.done((json) => { 
+				this.hideLoadingModal(); 
+				handler(json) 
+			})
+			.fail(() => {
+				$('#ErrorModalTitle').text("Communication Error");
+				$('#ErrorModalBody').html("<p>Unable to get applications</p>");
+				$('#ErrorModal').modal('show');
+			});
 	}
 
-	private static showErrorModal(title: string, body: string) {
-		$('#ErrorModalTitle').text(title);
-		$('#ErrorModalBody').html(body);
-		$('#ErrorModal').modal('show');
+	public static postComment(data: string) : void {
+		$.post('https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-comment-app', data)
+		.fail(() => {
+			$('#ErrorModalTitle').text("Communication Error");
+			$('#ErrorModalBody').html("<p>Unable to post comment</p>");
+			$('#ErrorModal').modal('show');
+		});
 	}
 
 	private static showLoadingModal() {

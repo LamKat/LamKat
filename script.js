@@ -14,24 +14,20 @@ function init() {
     map.on('locationerror', onLocationError);
     map.doubleClickZoom.disable();
     map.setMinZoom(15);
-    var gotoAndLoad = function (a) {
+    map.on('contextmenu', function (a) {
         var f = a;
         map.panTo(f.latlng);
         ServerDAO.getApplications(f.latlng, drawApplications);
-    };
-    map.on('touchstart', function () {
-        map.off('touchstart');
-        map.on('contextmenu', gotoAndLoad);
     });
-    map.on('tap', gotoAndLoad);
-    map.on('dblclick', gotoAndLoad);
     map.locate({ setView: true, maxZoom: 16 });
 }
 function onLocationError(e) {
-    console.log("Location not found");
-    /*
-        Display Location error
-    */
+    $('#ErrorModalTitle').text("Location Error");
+    $('#ErrorModalBody').html("<p>Unable to get device location. Please enable location</p>");
+    $('#ErrorModal').modal('show');
+    var defaultLatLng = new L.LatLng(52.93631488220747, 1.1357331275939944);
+    map.panTo(defaultLatLng);
+    ServerDAO.getApplications(defaultLatLng, drawApplications);
 }
 function onLocationFound(e) {
     var locationE = e;
@@ -87,18 +83,18 @@ function buildApplicationText(prop) {
         var c = prop.Comments;
         popup.find('#comments')
             .text('view ' + c.length + ' comments')
-            .click(function () { return showComments(prop.Description, prop.ID, c); });
+            .click(function () { return showComments(prop, c); });
     }
     else {
         popup.find('#comments')
             .text('Add first comment')
-            .click(function () { return showAddComment(prop.ID, prop.Description); });
+            .click(function () { return showAddComment(prop); });
     }
     return popup;
 }
-function showComments(description, id, comments) {
+function showComments(prop, comments) {
     var modal = $('#CommentModal');
-    modal.find('#ApplicationDescription').text(description);
+    modal.find('#ApplicationDescription').text(prop.Description);
     modal.find('#Comments')
         .empty()
         .append(comments.map(function (comment) {
@@ -109,17 +105,31 @@ function showComments(description, id, comments) {
     }));
     modal.find('#addComment').click(function () {
         modal.modal('hide');
-        showAddComment(id, description);
+        showAddComment(prop);
     });
     modal.modal('show');
 }
-function showAddComment(id, description) {
+function showAddComment(prop) {
     var modal = $('#AddCommentModal');
-    if (modal.find("#id").attr('value') !== id.toString()) {
-        modal.find("#id").attr('value', id);
+    if (modal.find("#id").attr('value') !== prop.ID.toString()) {
+        modal.find("#id").attr('value', prop.ID);
         modal.find('#comment').val('');
     }
-    modal.find('#ApplicationDescription').text(description);
+    modal.find('#ApplicationDescription').text(prop.Description);
+    var form = modal.find('form:first');
+    form.off('submit');
+    form.submit(function (e) {
+        if (!prop.Comments)
+            prop.Comments = [];
+        prop.Comments.push({
+            Comment: form.find('#comment').val(),
+            Name: form.find('#name').val()
+        });
+        map.closePopup();
+        modal.modal('hide');
+        ServerDAO.postComment(form.serialize());
+        e.preventDefault();
+    });
     modal.modal('show');
 }
 function fromTemplate(id) {
@@ -133,13 +143,18 @@ var ServerDAO = /** @class */ (function () {
         var _this = this;
         this.showLoadingModal();
         $.getJSON('https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-get-app', { radius: 0.5, latitude: latlng.lat, longitude: latlng.lng })
-            .done(function (json) { _this.hideLoadingModal(); handler(json); })
-            .fail(function () { _this.showErrorModal("Communication Error", "<p>Unable to get applications</p>"); });
+            .done(function (json) {
+            _this.hideLoadingModal();
+            handler(json);
+        })
+            .fail(function () {
+            $('#ErrorModalTitle').text("Communication Error");
+            $('#ErrorModalBody').html("<p>Unable to get applications</p>");
+            $('#ErrorModal').modal('show');
+        });
     };
-    ServerDAO.showErrorModal = function (title, body) {
-        $('#ErrorModalTitle').text(title);
-        $('#ErrorModalBody').html(body);
-        $('#ErrorModal').modal('show');
+    ServerDAO.postComment = function (data) {
+        $.post('https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-comment-app', data).fail(function () { return alert("fail"); });
     };
     ServerDAO.showLoadingModal = function () {
         $('#spinnerModal').modal("show");
