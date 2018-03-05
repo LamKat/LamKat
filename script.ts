@@ -16,8 +16,10 @@ function init() : void {
 	map.on('locationfound', onLocationFound);
 	map.on('locationerror', onLocationError);
 	map.doubleClickZoom.disable();
+	map.setMinZoom(15);
 	map.on('contextmenu', (a: LeafletEvent) => {
 		var f : LeafletMouseEvent = a as LeafletMouseEvent;
+		alert(f.originalEvent);
 		map.panTo(f.latlng)
 		ServerDAO.getApplications(f.latlng, drawApplications);
 	})

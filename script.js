@@ -13,8 +13,10 @@ function init() {
     map.on('locationfound', onLocationFound);
     map.on('locationerror', onLocationError);
     map.doubleClickZoom.disable();
+    map.setMinZoom(15);
     map.on('contextmenu', function (a) {
         var f = a;
+        alert(f.originalEvent);
         map.panTo(f.latlng);
         ServerDAO.getApplications(f.latlng, drawApplications);
     });
