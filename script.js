@@ -19,10 +19,10 @@ function init() {
         map.panTo(f.latlng);
         ServerDAO.getApplications(f.latlng, drawApplications);
     };
-    // map.on('touchstart', () => {
-    // 	map.off('touchstart');
-    // 	map.on('contextmenu', gotoAndLoad);
-    // });
+    map.on('touchstart', function () {
+        map.off('touchstart');
+        map.on('contextmenu', gotoAndLoad);
+    });
     map.on('tap', gotoAndLoad);
     map.on('dblclick', gotoAndLoad);
     map.locate({ setView: true, maxZoom: 16 });

@@ -20,13 +20,13 @@ function init() : void {
 
 	var gotoAndLoad =  (a: LeafletEvent) => {
 			var f : LeafletMouseEvent = a as LeafletMouseEvent;
-			map.panTo(f.latlng)
+			map.panTo(f.latlng);
 			ServerDAO.getApplications(f.latlng, drawApplications);
 		}
-	// map.on('touchstart', () => {
-	// 	map.off('touchstart');
-	// 	map.on('contextmenu', gotoAndLoad);
-	// });
+	map.on('touchstart', () => {
+		map.off('touchstart');
+		map.on('contextmenu', gotoAndLoad);
+	});
 	map.on('tap', gotoAndLoad);
 	map.on('dblclick', gotoAndLoad);
 
