@@ -17,12 +17,18 @@ function init() : void {
 	map.on('locationerror', onLocationError);
 	map.doubleClickZoom.disable();
 	map.setMinZoom(15);
-	map.on('contextmenu', (a: LeafletEvent) => {
-		var f : LeafletMouseEvent = a as LeafletMouseEvent;
-		alert(f.originalEvent);
-		map.panTo(f.latlng)
-		ServerDAO.getApplications(f.latlng, drawApplications);
-	})
+
+	var gotoAndLoad =  (a: LeafletEvent) => {
+			var f : LeafletMouseEvent = a as LeafletMouseEvent;
+			map.panTo(f.latlng)
+			ServerDAO.getApplications(f.latlng, drawApplications);
+		}
+	// map.on('touchstart', () => {
+	// 	map.off('touchstart');
+	// 	map.on('contextmenu', gotoAndLoad);
+	// });
+	map.on('tap', gotoAndLoad);
+	map.on('dblclick', gotoAndLoad);
 
 	map.locate({setView: true, maxZoom: 16});
 }
