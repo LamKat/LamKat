@@ -16,7 +16,7 @@ function init() : void {
 	map.on('locationfound', onLocationFound);
 	map.on('locationerror', onLocationError);
 	map.doubleClickZoom.disable();
-	map.on('tap', (a: LeafletEvent) => {
+	map.on('contextmenu', (a: LeafletEvent) => {
 		var f : LeafletMouseEvent = a as LeafletMouseEvent;
 		map.panTo(f.latlng)
 		ServerDAO.getApplications(f.latlng, drawApplications);

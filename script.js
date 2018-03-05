@@ -13,7 +13,7 @@ function init() {
     map.on('locationfound', onLocationFound);
     map.on('locationerror', onLocationError);
     map.doubleClickZoom.disable();
-    map.on('dblclick', function (a) {
+    map.on('contextmenu', function (a) {
         var f = a;
         map.panTo(f.latlng);
         ServerDAO.getApplications(f.latlng, drawApplications);
