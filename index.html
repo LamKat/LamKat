@@ -23,7 +23,6 @@
 	</head>
 	<body>
 		<div id='map'></div>	
-		<script>init();</script>
 
 		<div class="modal fade" id="ErrorModal" role="dialog">
 			<div class="modal-dialog modal-lg">
@@ -58,8 +57,8 @@
 		<template id="commentCardTemplate">
 			<div class="card">
 				<div class="card-block">
-					<h6 class="card-subtitle mb-2 text-muted" id="name">Stephen</h6>
-					<p class="card-text" id='comment'>I really like this application</p>
+					<h6 class="card-subtitle mb-2 text-muted" id="name"></h6>
+					<p class="card-text" id='comment'></p>
 				</div>
 			</div>
 		</template>
@@ -126,7 +125,68 @@
 		</template>
 		
 
-		<div class="modal fade" id="spinnerModal"/>
+		<div class="modal fade" id="spinnerModal"></div>
+
+		<div class="modal fade" id="aboutModal" data-backdrop="static">
+
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">Welcome to the BOTL Project</h4>
+					</div>
+					<div class="modal-body">
+						<div class="card">
+							<div class="card-block">
+								<h4 class="card-title">About</h4>
+								<p class="card-text">
+									BOTL is a reserch project to test the hyposisis that using a 
+										technological solution to reduce the cost of getting informed 
+										about urban planning will result in better engadgment in planning consultation.
+								</p>
+
+								<p class="card-text">
+									This webpage is designed to make it easier to find out about what planning application 
+									have been submitted in your local area, and to facilitate better engagement.
+								</p>
+							</div>
+						</div>
+						
+						<div class="card">
+							<div class="card-block">
+								<h4 class="card-title">How to use</h4>
+								<p class="card-text">
+										Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+								</p>
+							</div>
+						</div>
+
+						<div class="card">
+							<div class="card-block">
+								<h4 class="card-title">Disclamer</h4>
+								<p class="card-text">
+									TL;DR - <i>caveat usor</i>
+								</p>
+								<p class="card-text">
+									While care has been taken to ensure software correctness and user privicy is protected, 
+									the project has been developed as a research tool and should be treated as such.
+								</p>
+								<p class="card-text">
+									Any questions or issues should be directed to 
+									<a class="card-link" href="mailto:psysme@nottingham.ac.uk">psysme@nottingham.ac.uk</a>
+								</p>
+							</div>
+						</div>
+
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" id="useLocation" data-dismiss="modal">Use my location</button>
+						<button type="button" class="btn btn-default" id="dontUseLocation" data-dismiss="modal">Dont use my location</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<script>init();</script>
 	</body>
 </html>
 

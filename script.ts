@@ -1,45 +1,84 @@
 /// <reference path="script.d.ts" />
+
 var map : Map;
+
+/*
+Full disclosure, projections are hard. Here is the flow of projections 
+In LPA site = OSGB36
+This is then shifted to the WGS84 and stored in the database using Jcoord (Helmert datum transformation) (EPSG4326?)
+We are using the geojson standard of WGS84 in out REST service
+We are then imploring Leaflet to project using EPSG3857. 
+All polygons are slightly wrong. I think this is an issue with JCoord??
+ */
+
+/* images courtesy http://ajaxload.info/ & https://mapicons.mapsmarker.com/ */
+
+const mapOptions: L.MapOptions = {minZoom: 15};
+const mapSource: string = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
+const mapBoxAttribution: string = '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>'
+const defaultLatLng: LatLng = new L.LatLng(52.9495761, -1.1548782); //Nottingham castle
+const commentAPI: string = 'https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-comment-app';
+const applicationAPI: string = 'https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-get-app';
+
+const applicationMarkerIcon: L.Icon = L.icon({
+		iconUrl: 'images/application.png',
+		iconSize: [32, 37],
+		iconAnchor: [16, 37],
+		popupAnchor: [0, -35]
+	});
+const userLocationMarkerIcon: L.Icon = L.icon({
+		iconUrl: 'images/location.png',
+		iconSize: [32, 37],
+		iconAnchor: [16, 37],
+		popupAnchor: [0, -35]
+	});
+
 function init() : void {
-	var mapOverlays;
-	map = L.map('map').fitWorld();
-	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-		maxZoom: 18,
-		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-			'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-			'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+	var aboutModal = $('#aboutModal').modal('show');
+	aboutModal.find('#useLocation').click(() => {
+		map.locate({setView: true, enableHighAccuracy: true})
+	});
+	aboutModal.find('#dontUseLocation').click(() => {
+		gotoLocation(defaultLatLng);
+	});
+	setupMap();
+}
+
+function setupMap(){
+	map = L.map('map', mapOptions).fitWorld();
+	L.tileLayer(mapSource, {
+		attribution: mapBoxAttribution,
 		id: 'mapbox.streets'
 	}).addTo(map);
-
+	
 	map.on('locationfound', onLocationFound);
 	map.on('locationerror', onLocationError);
-	map.doubleClickZoom.disable();
-	map.setMinZoom(15);
 
-	
-	map.on('contextmenu', (a: LeafletEvent) => {
-			var f : LeafletMouseEvent = a as LeafletMouseEvent;
-			map.panTo(f.latlng);
-			ServerDAO.getApplications(f.latlng, drawApplications);
+	map.on('contextmenu', (e: LeafletEvent) => {
+			gotoLocation((e as LeafletMouseEvent).latlng)
 		});
-
-	map.locate({setView: true, maxZoom: 16});
 }
 
 function onLocationError(e : LeafletEvent) : void {
 	$('#ErrorModalTitle').text("Location Error");
 	$('#ErrorModalBody').html("<p>Unable to get device location. Please enable location</p>");
 	$('#ErrorModal').modal('show');
-	var defaultLatLng: LatLng = new L.LatLng(52.93631488220747, 1.1357331275939944);
-	map.panTo(defaultLatLng);
-	ServerDAO.getApplications(defaultLatLng, drawApplications);
+	gotoLocation(defaultLatLng);
+}
+
+function gotoLocation(location : LatLng) {
+	map.panTo(location);
+	getApplications(location, drawApplications);
 }
 
 function onLocationFound(e : LeafletEvent) : void {
 	var locationE = e as LocationEvent;
-	//TODO make this more destinctive 
-	L.marker(locationE.latlng).addTo(map).bindPopup("You are here"); 
-	ServerDAO.getApplications(locationE.latlng, drawApplications);
+	L.marker(locationE.latlng)
+		.setIcon(userLocationMarkerIcon)
+		.bindPopup('<p class="text-center">You are here</p>', {minWidth: 300})
+		.addTo(map);
+	
+	getApplications(locationE.latlng, drawApplications);
 }
 
 function drawApplications(geojson :  GeoJsonObject) : void {
@@ -47,9 +86,14 @@ function drawApplications(geojson :  GeoJsonObject) : void {
 	map.addLayer(L.geoJSON(geojson, {
 		onEachFeature: (feature, layer) => {
 			if (feature.properties) {
-				layer.bindPopup(() => {return createApplicationPopup(feature.properties)}, {minWidth: 300});
+				layer.bindPopup(() => {
+					return createApplicationPopup(feature.properties)
+				}, {minWidth: 300});
 			}
-		} 
+		},
+		pointToLayer: (feature, latLng) => {
+			return L.marker(latLng, {icon: applicationMarkerIcon});
+		}
 	}));
 }
 
@@ -90,7 +134,7 @@ function buildApplicationText(prop: Application) : JQuery<HTMLElement>{
 		window.open(prop.URL, '_blank');
 	});
 
-	if(prop.Comments !== null && prop.Comments !== undefined) { //Shout out to typescript, what a guy
+	if(prop.Comments) {
 		var c : Comment[] = prop.Comments;
 		popup.find('#comments')
 			.text('view ' + c.length + ' comments')
@@ -139,7 +183,7 @@ function showAddComment(prop: Application) {
 		} as Comment);
 		map.closePopup();
 		modal.modal('hide');
-		ServerDAO.postComment(form.serialize());
+		postComment(form.serialize());
 		e.preventDefault();
 	});
 	modal.modal('show');
@@ -150,40 +194,27 @@ function fromTemplate(id: string) : JQuery<HTMLElement>{
 	return $(template.content.cloneNode(true));
 }
 
-class ServerDAO {
 
-	public static getApplications(latlng : LatLng, handler : Function) : void {
-		this.showLoadingModal();
-		$.getJSON('https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-get-app',
-				{radius: 0.5, latitude: latlng.lat, longitude: latlng.lng})
-			.done((json) => { 
-				this.hideLoadingModal(); 
-				handler(json) 
-			})
-			.fail(() => {
-				$('#ErrorModalTitle').text("Communication Error");
-				$('#ErrorModalBody').html("<p>Unable to get applications</p>");
-				$('#ErrorModal').modal('show');
-			});
-	}
-
-	public static postComment(data: string) : void {
-		$.post('https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-comment-app', data)
+function getApplications(latlng : LatLng, handler : (json: GeoJsonObject) => void) : void {
+	$('#spinnerModal').modal("show");
+	$.getJSON(applicationAPI,
+			{radius: 0.5, latitude: latlng.lat, longitude: latlng.lng})
+		.always(() => $('#spinnerModal').modal("hide"))
+		.done(handler)
 		.fail(() => {
 			$('#ErrorModalTitle').text("Communication Error");
-			$('#ErrorModalBody').html("<p>Unable to post comment</p>");
+			$('#ErrorModalBody').html("<p>Unable to get applications</p>");
 			$('#ErrorModal').modal('show');
 		});
-	}
+}
 
-	private static showLoadingModal() {
-		$('#spinnerModal').modal("show");
-	}
-
-	private static hideLoadingModal() {
-		$('#spinnerModal').modal("hide");
-	}
-
+function postComment(data: string) : void {
+	$.post(commentAPI, data)
+	.fail(() => {
+		$('#ErrorModalTitle').text("Communication Error");
+		$('#ErrorModalBody').html("<p>Unable to post comment</p>");
+		$('#ErrorModal').modal('show');
+	}); 
 }
 
 
