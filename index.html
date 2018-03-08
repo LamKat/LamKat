@@ -74,17 +74,17 @@
 
 							<div class="form-group">
 								<label class="col-form-label">Display name</label>
-								<input type="text" class="form-control" id="name" placeholder="Display Name" name="name" required>
+								<input type="text" class="form-control" id="name" placeholder="Display Name" name="name" maxlength="75" required>
 							</div>
 							<div class="form-group">
 								<label class="col-form-label">Email</label>
-								<input type="text" class="form-control" id="email" placeholder="Email (optional)" name="email">
+								<input type="text" class="form-control" id="email" placeholder="Email (optional)" name="email" maxlength="300">
 								<small class="form-text text-muted">If you wish to receave updates when someone else comments on this application, 
 									please provide an email address, otherwise leave blank</small>
 							</div>
 							<div class="form-group">
 								<label>Comment</label>
-								<textarea class="form-control" id="comment" rows="3" placeholder="Comment" name="comment" required></textarea>
+								<textarea class="form-control" id="comment" rows="3" placeholder="Comment" name="comment" maxlength="150" required></textarea>
 							</div>
 							<input type="hidden" name="application" id="id">
 							<div style="text-align: right;">
@@ -139,9 +139,9 @@
 							<div class="card-block">
 								<h4 class="card-title">About</h4>
 								<p class="card-text">
-									BOTL is a reserch project to test the hyposisis that using a 
+									BOTL is a research project to test the hypothesis that using a 
 										technological solution to reduce the cost of getting informed 
-										about urban planning will result in better engadgment in planning consultation.
+										about urban planning will result in better engagement in planning consultation.
 								</p>
 
 								<p class="card-text">
@@ -155,7 +155,19 @@
 							<div class="card-block">
 								<h4 class="card-title">How to use</h4>
 								<p class="card-text">
-										Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+									If you want to use your device location to find local applications, 
+									please select the "Use my location" button bellow, otherwise the map will 
+									be centred on Nottingham castle.
+								</p>
+								<p class="card-text">
+									You can load more applications by dragging the map to the desired location then
+									<kbd>long tap</kbd> or <kbd>right click</kbd> where to load applications.
+								</p>
+
+								<p class="card-text">
+									Comments can be added to the applications, these will be shown to other users. 
+									You can <b>optionally</b> enter your email in order to receive updates when other 
+									users comment on that application. 
 								</p>
 							</div>
 						</div>
@@ -167,8 +179,12 @@
 									TL;DR - <i>caveat usor</i>
 								</p>
 								<p class="card-text">
-									While care has been taken to ensure software correctness and user privicy is protected, 
+									While care has been taken to ensure software correctness and user privacy is protected, 
 									the project has been developed as a research tool and should be treated as such.
+								</p>
+								<p class="card-text">
+									The botl project is not an official forum for planning consultation;
+									no comments will used in LPA consultation.
 								</p>
 								<p class="card-text">
 									Any questions or issues should be directed to 

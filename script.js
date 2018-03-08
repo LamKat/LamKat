@@ -10,7 +10,7 @@ All polygons are slightly wrong. I think this is an issue with JCoord??
  */
 /* images courtesy http://ajaxload.info/ & https://mapicons.mapsmarker.com/ */
 var mapOptions = { minZoom: 15 };
-var mapSource = 'http://{s}.tile.osm.org/{z}/{x}/{y}.png';
+var mapSource = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
 var mapBoxAttribution = '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>';
 var defaultLatLng = new L.LatLng(52.9495761, -1.1548782); //Nottingham castle
 var commentAPI = 'https://872qc811b5.execute-api.us-east-1.amazonaws.com/prod/botl-comment-app';
@@ -79,11 +79,6 @@ function drawApplications(geojson) {
         },
         pointToLayer: function (feature, latLng) {
             return L.marker(latLng, { icon: applicationMarkerIcon });
-        },
-        coordsToLatLng: function (_a) {
-            var lng = _a[0], lat = _a[1];
-            console.log("lat: " + lat + "\tlng: " + lng);
-            return new L.LatLng(lat, lng);
         }
     }));
 }
